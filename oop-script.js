@@ -35,6 +35,15 @@ class APIService {
         // console.log(data)
         return data.cast.slice(0,5).map(actor => new Actor(actor))
     }
+    static async fetchDirector(movie_id) {
+      const url = APIService._constructUrl(`movie/${movie_id}/credits`)
+      const response = await fetch(url)
+      const data = await response.json()
+      // console.log(data)
+      // const directorData= data.crew.find(x => x.job=="Director")
+      return data.crew.find(x => x.job=="Director")
+      // console.log(directorData)
+  }    
 
     static async fetchActors(movie_id) {
         const url = APIService._constructUrl(`person/${person_id}`)
@@ -125,15 +134,16 @@ class Movies {
         const castData= await APIService.fetchCredits(movie.id)
         const relatedMovies=await APIService.fetchRelatedMvoies(movie.id)
         const movieTrialers=await APIService.fetchTrailers(movie.id)
+        const directorName=await APIService.fetchDirector(movie.id)
         // console.log(castData)
-        MoviePage.renderMovieSection(movieData,castData,relatedMovies,movieTrialers);
+        MoviePage.renderMovieSection(movieData,castData,relatedMovies,movieTrialers,directorName);
     }
 }
 
 class MoviePage {
     static container = document.getElementById('container');
-    static renderMovieSection(movie,cast,related,trailers) {
-      MovieSection.renderMovie(movie,cast,related,trailers);
+    static renderMovieSection(movie,cast,related,trailers,director) {
+      MovieSection.renderMovie(movie,cast,related,trailers,director);
     }
 }
 
@@ -144,8 +154,8 @@ class ActorPage {
     }
 }
 class MovieSection {
-    static renderMovie(movie,cast,related,trailers) {
-      console.log(trailers)
+    static renderMovie(movie,cast,related,trailers,director) {
+      // console.log(trailers)
         MoviePage.container.innerHTML = `
       <div class="row">
         <div class="col-md-4">
@@ -154,17 +164,16 @@ class MovieSection {
         <div class="col-md-8">
           <h2 id="movie-title">${movie.title}</h2>
           <p id="genres">${movie.genres.slice(0, -2)}</p>
-          <h3>Spoken Languages:</h3>
-          <p id="language">${movie.language.slice(0, -2)}</p>
-          <p id="movie-release-date">Movie release date: ${movie.releaseDate}</p>
-          <p id="movie-runtime">Movie runtime: ${movie.runtime}</p>
-          <p id="movie-rate">Movie rate: </p>
-          <p id="vote_count"> Movie vote count: ${movie.vote_count}</p>
+          <p id="language">Languages: ${movie.language.slice(0, -2)}</p>
+          <p id="movie-release-date">Release date: ${movie.releaseDate}</p>
+          <p id="movie-runtime">Runtime: ${movie.runtime}</p>
+          <p id="">Rate: ${movie.rating}, Vote count: ${movie.vote_count} </p>
           
           <h3>Overview:</h3>
             <p id="movie-overview">${movie.overview}</p>
         </div>
       </div>
+      <h5>Director Name: ${director.name}</h5>
       <h3>Actors:</h3>
       <div id="actors">
         ${cast.map(actor =>`
@@ -265,7 +274,7 @@ class Movie {
         }
         
         this.productionCompanies=json.production_companies;
- 
+        this.rating=json.vote_average;
     }
 
   get backdropUrl() {
@@ -284,8 +293,10 @@ class Actor{
   constructor(json){
     this.name=json.name;
     this.profile=json.profile_path;
-    
+    // console.log(json);
+
   }
+
   get backdropUrl() {
     return this.profile ? Actor.BACKDROP_BASE_URL + this.profile : "";
   }  
@@ -293,10 +304,7 @@ class Actor{
 class Trailers{
   constructor(json){
     this.key=json.key;
-
   }
-
-  
 }
 
 document.addEventListener("DOMContentLoaded", App.run);
@@ -307,4 +315,3 @@ document.addEventListener("DOMContentLoaded", App.run);
 //  } );
 
 //  document.getElementById("nav-link").addEventListener("click", ActorsNavbar.run);
-//return this.logo == null ? "No Logo Found" : <img></img>
