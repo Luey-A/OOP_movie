@@ -14,3 +14,10 @@
 #actors img{
   width: 80%;
 }
+#related {
+    margin: 24px 16px 0 0;
+}
+
+.related {
+ width: 51.5%;
+}
