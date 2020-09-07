@@ -16,7 +16,6 @@ class ActorsNavbar {
     }
 }
 
-
 class APIService {
     static TMDB_BASE_URL = 'https://api.themoviedb.org/3';
     static async fetchMovies() {
@@ -44,7 +43,7 @@ class APIService {
       return data.crew.find(x => x.job=="Director")
       // console.log(directorData)
   }    
-
+        
     static async fetchActors(movie_id) {
         const url = APIService._constructUrl(`person/${person_id}`)
         const response = await fetch(url)
@@ -83,7 +82,6 @@ class APIService {
 
     static _constructUrl(path) {
         return `${this.TMDB_BASE_URL}/${path}?api_key=${atob('NTQyMDAzOTE4NzY5ZGY1MDA4M2ExM2M0MTViYmM2MDI=')}`;
-      
     }
 } 
 
@@ -283,6 +281,7 @@ class Movie {
 
     
 }
+
 class Rating{
   constructor(json){
     this.value=json.value;
